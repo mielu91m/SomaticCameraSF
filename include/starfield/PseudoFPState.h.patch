@@ -1,0 +1,10 @@
+--- mod3_orig/include/starfield/PseudoFPState.h	2026-07-17 11:43:38.000000000 +0000
++++ mod3/include/starfield/PseudoFPState.h	2026-07-18 15:49:41.633249279 +0000
+@@ -27,6 +27,7 @@
+     extern bool g_HasLastValidHeadAnchorWorld;
+     extern bool g_HasSAFRigidSmoothedHeadPos;
+     extern bool g_HasSAFLastRealFrameHeadPos;
++    extern int g_SAFSceneAgeTicks;
+     extern RE::NiPoint3 g_LastRawUltraRigidAnchor;
+     extern bool g_HasLastRawUltraRigidAnchor;
+     extern RE::NiPoint3 g_SAFPinnedCameraLocalOffset;

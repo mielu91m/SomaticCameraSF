@@ -1,0 +1,26 @@
+--- mod4_orig/source/starfield/HeadTracking.cpp	2026-07-18 22:21:26.000000000 +0000
++++ mod4/source/starfield/HeadTracking.cpp	2026-07-19 06:40:17.712212282 +0000
+@@ -537,13 +537,17 @@
+             return {};
+         }
+         const RE::NiPoint3 smoothedHeadPos = GetSAFSmoothedHeadPosition();
+-        // Use the actual eye offset from the skeleton (Eye_Target / head mesh)
+-        // applied in the head bone's own local space. The head's world rotation
+-        // already accounts for whatever tilt the SAF animation produces, so
+-        // the offset follows the real eye position instead of drifting above
+-        // the head when the stable frame's world-up assumption doesn't match.
++        // Use the SAME pose-stable frame the camera's own rotation is built
++        // from (yaw-only from the head's horizontal facing direction,
++        // always upright via world Z) instead of the raw head-bone rotation
++        // matrix. The raw matrix's 'up' column doesn't reliably correspond
++        // to anatomical up for this joint - it rolls with the head's own
++        // tilt, so the same local offset landed in a different real-world
++        // direction depending on standing/prone/supine pose. This frame is
++        // already confirmed stable (it's what the camera looks down).
++        const RE::NiMatrix3 stableRot = ComputeSAFRigidEyeWorldRotation();
+         const RE::NiPoint3 headLocalOffset = GetSAFHeadLocalOffset();
+-        const RE::NiPoint3 worldOffset = TransformLocalToWorld(g_HeadBone->world.rotate, headLocalOffset);
++        const RE::NiPoint3 worldOffset = TransformLocalToWorld(stableRot, headLocalOffset);
+         return smoothedHeadPos + worldOffset;
+     }
+ 

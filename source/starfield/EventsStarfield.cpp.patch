@@ -1,0 +1,87 @@
+--- mod12_orig/source/starfield/EventsStarfield.cpp	2026-07-24 19:59:54.000000000 +0000
++++ mod12/source/starfield/EventsStarfield.cpp	2026-07-24 20:26:23.384810816 +0000
+@@ -671,8 +671,19 @@
+     static bool wasToggleDown = false;
+     bool isToggleDown = (GetAsyncKeyState(g_ToggleKey) & 0x8000) != 0;
+     if (isToggleDown && !wasToggleDown) {
+-        if (camera && IsInShipCameraState(camera)) {
+-            LogFormatted("PseudoFP: toggle ignored (ship camera state active)");
++        // NOTE: this used to check IsInShipCameraState(camera) to decide
++        // whether to ignore the toggle while flying - but that never
++        // returns true for this ship/setup (confirmed via logs), making
++        // the guard a permanent no-op. Pressing the toggle key mid-flight
++        // therefore always fell through and called ForceThirdPerson()
++        // below, manually forcing a camera state transition from outside
++        // the engine's own trigger path - exactly what threw the camera
++        // outside the ship. Use the reliable FormID-based seat check
++        // instead, and simply don't allow the toggle to have any visible
++        // camera effect while seated in the ship at all.
++        auto* toggleCheckPlayer = RE::PlayerCharacter::GetSingleton();
++        if (toggleCheckPlayer && IsPlayerInShipPilotSeat(toggleCheckPlayer)) {
++            LogFormatted("PseudoFP: toggle ignored (seated in ship pilot seat)");
+         } else {
+             g_PseudoUserEnabled = !g_PseudoUserEnabled;
+             LogFormatted("PseudoFP: user %s by key VK=%d", g_PseudoUserEnabled ? "ENABLED" : "DISABLED", g_ToggleKey);
+@@ -985,7 +996,12 @@
+                     // both hand off to a real engine camera. When the user
+                     // releases the trigger / flight ends, pseudo resumes
+                     // automatically.
+-                    // Allow pseudo during sit/stand animation in pilot seat (furniture state)
++                    // Allow pseudo during sit/stand animation in pilot seat
++                    // (furniture state). The camera-outside-the-ship bug
++                    // was traced to the toggle-key handler's unconditional
++                    // ForceThirdPerson() call (see above), not to pseudo's
++                    // own camera-node writes during sit/stand - restoring
++                    // this now that the real cause is fixed.
+                     const bool inPilotSeatFlying = nowInPilotSeatForFlight && !isFurnitureState;
+                     shouldPseudo = !isAimingNow && !isActivelyFlying && !inPilotSeatFlying;
+                     // Force FPP back to TPP - including during SAF. This
+@@ -1101,16 +1117,38 @@
+                             // The ship's own camera system will position correctly.
+                             ClearPseudoCameraPointers();
+                             LogFormatted(isActivelyFlying ? "PseudoFP: disabled (ship flight started)" : "PseudoFP: disabled (non-TPP without SAF)");
+-                            if (isActivelyFlying && camera && !IsInShipCameraState(camera)) {
+-                                // Don't touch FirstPerson (cockpit FPP view
+-                                // is valid during flight). For other bad
+-                                // states (Free*), set the ship flight state
+-                                // explicitly rather than ThirdPerson.
+-                                if (!camera->IsInFirstPerson()) {
+-                                    LogFormatted("PseudoFP: non-FPP camera during flight - switching to kFlight");
+-                                    camera->SetCameraState(RE::CameraState::kFlight);
+-                                }
+-                            }
++                            // NOTE: this used to forcibly set a camera state
++                            // here (first ForceThirdPerson(), later
++                            // SetCameraState(kFlight)) whenever
++                            // IsInShipCameraState(camera) was false. But
++                            // IsInShipCameraState never returns true for
++                            // this ship/setup (confirmed via logs), so that
++                            // condition was ALWAYS true during flight,
++                            // meaning we forced a camera state transition
++                            // manually on every single flight-disable - and
++                            // manually forcing a state transition outside
++                            // the engine's own trigger path is exactly what
++                            // produced the reported broken/orbit-camera
++                            // symptom. Do nothing here now: once we stop
++                            // writing camera node positions (above) and get
++                            // out of the way, the engine's own native
++                            // flight-camera logic should take over on its
++                            // own, the same way it would with this mod not
++                            // installed at all.
++                        }
++                        if (isActivelyFlying) {
++                            // Keep neutralizing our own residual influence
++                            // every frame for as long as we're latched out,
++                            // not just once at the moment we disable. The
++                            // one-shot reset above happens as soon as the
++                            // sit-animation timer expires, which is usually
++                            // well before the player actually launches (they
++                            // often sit for a while first) - if the engine's
++                            // own ship-camera nodes only get created/
++                            // positioned later, at the real undock moment,
++                            // a single early reset doesn't protect against
++                            // whatever state exists by then.
++                            ClearPseudoCameraPointers();
+                         }
+                         if (!isBodyState) {
+                             // Skip TPP-specific logic below

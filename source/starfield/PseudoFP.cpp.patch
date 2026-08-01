@@ -1,0 +1,55 @@
+--- mod8_orig/source/starfield/PseudoFP.cpp	2026-07-23 22:19:44.000000000 +0000
++++ mod8/source/starfield/PseudoFP.cpp	2026-07-24 04:19:03.771961267 +0000
+@@ -161,9 +161,16 @@
+         // NOT yet Flight/Ship*) is NOT affected by this and stays pseudo-
+         // active below - the skeleton is valid and in the right place
+         // right up until actual flight begins.
+-        if (camera && IsInShipCameraState(camera)) {
+-            return true;
+-        }
++        // NOTE: this used to hard-return here during genuine ship flight
++        // (IsInShipCameraState), because the player's own skeleton - which
++        // this rig is built on - wasn't kept in sync with the ship's actual
++        // position in space while piloting, so forcing a position from it
++        // could teleport the camera away from the ship. Per request, ships
++        // now behave like ordinary vehicles - pseudo stays active through
++        // flight too, controlled only by the toggle key. If the camera
++        // drifts/teleports away from the ship during flight, reintroduce:
++        //   if (camera && IsInShipCameraState(camera)) { return true; }
++        // here.
+         auto* player = RE::PlayerCharacter::GetSingleton();
+         if (camera && !camera->IsInThirdPerson() && !camera->QCameraEquals(RE::CameraState::kIronSights) && !IsInShipCameraState(camera) && !IsInVehicleCameraState(camera)) {
+             auto* tcam = static_cast<RE::TESCamera*>(camera);
+@@ -309,13 +316,9 @@
+ 
+     void ForceCameraToHead()
+     {
+-        auto* shipCheckCamera = RE::PlayerCamera::GetSingleton();
+-        if (shipCheckCamera && IsInShipCameraState(shipCheckCamera)) {
+-            // Same hard lock as RestorePseudoRig/ApplyPseudoFPPRig - never
+-            // position the camera from here while genuinely flying, no
+-            // matter which call site invoked this function.
+-            return;
+-        }
++        // NOTE: used to hard-return here during ship flight (see the note
++        // in ApplyPseudoFPPRig) - removed per request so pseudo stays
++        // active through flight, same as ordinary vehicles.
+         const auto now = std::chrono::steady_clock::now();
+         const bool sameRealFrame = g_HasLastForceComputeTime &&
+             std::chrono::duration_cast<std::chrono::microseconds>(now - g_LastForceComputeTime).count() < 2000;
+@@ -377,12 +380,9 @@
+         if (!g_PseudoFPPActive) return;
+ 
+         auto* camera = RE::PlayerCamera::GetSingleton();
+-        if (camera && IsInShipCameraState(camera)) {
+-            // Hard lock: never let the pseudo rig touch the camera while
+-            // the engine is genuinely in a ship flight state, regardless
+-            // of whether g_PseudoFPPActive has caught up to that yet.
+-            return;
+-        }
++        // NOTE: used to hard-return here during ship flight (see the note
++        // in ApplyPseudoFPPRig) - removed per request so pseudo stays
++        // active through flight, same as ordinary vehicles.
+         if (camera && !camera->QCameraEquals(RE::CameraState::kFurniture)) {
+             auto* p = RE::PlayerCharacter::GetSingleton();
+             if (p && IsPlayerInShipPilotSeat(p)) {

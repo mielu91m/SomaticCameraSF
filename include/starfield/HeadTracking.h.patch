@@ -1,0 +1,10 @@
+--- mod3_orig/include/starfield/HeadTracking.h	2026-07-17 23:30:28.000000000 +0000
++++ mod3/include/starfield/HeadTracking.h	2026-07-18 15:49:41.619542747 +0000
+@@ -23,6 +23,7 @@
+     extern bool g_HasLastValidHeadAnchorWorld;
+     extern bool g_HasSAFRigidSmoothedHeadPos;
+     extern bool g_HasSAFLastRealFrameHeadPos;
++    extern int g_SAFSceneAgeTicks;
+     extern RE::NiPoint3 g_LastRawUltraRigidAnchor;
+     extern bool g_HasLastRawUltraRigidAnchor;
+     extern RE::NiPoint3 g_SAFPinnedCameraLocalOffset;
