@@ -4,7 +4,10 @@ Somatic Camera SF"  — Beta
 
 
 New Beta 7:
+
+
 Added support for Osf UI (by ozooma10)
+
 You can now change pseudo-camera settings in-game, such as:
 - iToggleKey (currently has an issue with Numpad)
 - fFOV
