@@ -166,15 +166,22 @@ namespace Settings {
         bool Save(const std::string& section, mINI::INIStructure& ini) override;
     };
 
-    struct PseudoFP : ISetting {
-        bool enablePseudoFP = false;
-        float headOffsetX = 0.0f;
-        float headOffsetY = 0.0f;
-        float headOffsetZ = 0.0f;
-        float cameraDistance = 0.0f;
-        float cameraHeight = 0.0f;
+struct PseudoFP : ISetting {
+         bool enablePseudoFP = false;
+         float headOffsetX = 0.0f;
+         float headOffsetY = 0.0f;
+         float headOffsetZ = 0.0f;
+         float cameraDistance = 0.0f;
+         float cameraHeight = 0.0f;
+         int toggleKey = 111;
+         float fov = 97.0f;
+         bool autoEquipHideHeadSS = true;
+         bool autoEquipHideHead = true;
+         float safOffsetSide = 0.04f;
+         float safOffsetUp = 0.0f;
+         float safOffsetForward = 0.08f;
 
-        bool Load(const std::string& section, const mINI::INIStructure& ini) override;
-        bool Save(const std::string& section, mINI::INIStructure& ini) override;
-    };
+         bool Load(const std::string& section, const mINI::INIStructure& ini) override;
+         bool Save(const std::string& section, mINI::INIStructure& ini) override;
+     };
 }

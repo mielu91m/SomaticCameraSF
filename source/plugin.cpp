@@ -65,6 +65,10 @@ namespace DLLMain {
 
     Plugin::~Plugin()
     {
+        if (m_OsfUiIntegration) {
+            m_OsfUiIntegration->Shutdown();
+            m_OsfUiIntegration.reset();
+        }
         m_Graphics.reset();
         m_Config.reset();
         m_StarfieldSF.reset();
@@ -79,26 +83,31 @@ namespace DLLMain {
             m_StarfieldSF = std::make_unique<Patch::StarfieldSF>();
             LogFormatted("allocated config=%p starfield=%p", static_cast<void*>(m_Config.get()), static_cast<void*>(m_StarfieldSF.get()));
 
-            if (m_Config) {
-                if (!m_Config->Load()) {
-                    LogFormatted("Config::Load failed");
-                    return false;
-                }
-                auto pseudo = m_Config->PseudoFP();
-                LogFormatted("Config::Load ok pseudo=%p enabled=%d",
-                    static_cast<void*>(pseudo),
-                    (pseudo && pseudo->enablePseudoFP) ? 1 : 0);
-            }
+if (m_Config) {
+                 if (!m_Config->Load()) {
+                     LogFormatted("Config::Load failed");
+                     return false;
+                 }
+                 auto pseudo = m_Config->PseudoFP();
+                 LogFormatted("Config::Load ok pseudo=%p enabled=%d",
+                     static_cast<void*>(pseudo),
+                     (pseudo && pseudo->enablePseudoFP) ? 1 : 0);
+             }
 
-            if (m_StarfieldSF) {
-                if (!m_StarfieldSF->Load(m_Config.get())) {
-                    LogFormatted("StarfieldSF::Load failed");
-                    return false;
-                }
-                LogFormatted("StarfieldSF::Load ok");
-            }
+             if (m_StarfieldSF) {
+                 if (!m_StarfieldSF->Load(m_Config.get())) {
+                     LogFormatted("StarfieldSF::Load failed");
+                     return false;
+                 }
+                 LogFormatted("StarfieldSF::Load ok");
+             }
 
-            m_Loaded = true;
+             m_OsfUiIntegration = std::make_unique<Patch::OsfUiIntegration>();
+             if (m_OsfUiIntegration) {
+                 m_OsfUiIntegration->Init(m_Config.get());
+             }
+
+             m_Loaded = true;
         }
         LogFormatted("Plugin::Load success");
         return true;

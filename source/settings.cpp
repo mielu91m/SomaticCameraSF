@@ -344,6 +344,13 @@ namespace Settings {
         headOffsetZ = GetValue(section, "headOffsetZ", ini, 0.0f);
         cameraDistance = GetValue(section, "cameraDistance", ini, 0.0f);
         cameraHeight = GetValue(section, "cameraHeight", ini, 0.0f);
+        toggleKey = GetValue(section, "iToggleKey", ini, 111);
+        fov = GetValue(section, "fFOV", ini, 97.0f);
+        autoEquipHideHeadSS = GetValue(section, "bAutoEquipHideHeadSS", ini, true);
+        autoEquipHideHead = GetValue(section, "bAutoEquipHideHead", ini, true);
+        safOffsetSide = GetValue(section, "fSAFOffsetSide", ini, 0.04f);
+        safOffsetUp = GetValue(section, "fSAFOffsetUp", ini, 0.0f);
+        safOffsetForward = GetValue(section, "fSAFOffsetForward", ini, 0.08f);
         return true;
     }
 
@@ -355,6 +362,13 @@ namespace Settings {
         SetValue(ini, section, "headOffsetZ", headOffsetZ);
         SetValue(ini, section, "cameraDistance", cameraDistance);
         SetValue(ini, section, "cameraHeight", cameraHeight);
+        SetValue(ini, section, "iToggleKey", toggleKey);
+        SetValue(ini, section, "fFOV", fov);
+        SetValue(ini, section, "bAutoEquipHideHeadSS", autoEquipHideHeadSS);
+        SetValue(ini, section, "bAutoEquipHideHead", autoEquipHideHead);
+        SetValue(ini, section, "fSAFOffsetSide", safOffsetSide);
+        SetValue(ini, section, "fSAFOffsetUp", safOffsetUp);
+        SetValue(ini, section, "fSAFOffsetForward", safOffsetForward);
         return true;
     }
 }

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "starfield/StarfieldSF.h"
+#include "starfield/OsfUiIntegration.h"
 #include "systems/Config.h"
 #include "systems/Graphics.h"
 #include "systems/Logging.h"
@@ -62,6 +63,7 @@ namespace DLLMain {
         Systems::Logging m_Logging;
 
         std::unique_ptr<Patch::StarfieldSF> m_StarfieldSF = nullptr;
+        std::unique_ptr<Patch::OsfUiIntegration> m_OsfUiIntegration = nullptr;
         std::unique_ptr<Systems::Config> m_Config = nullptr;
         std::unique_ptr<Systems::Graphics> m_Graphics = nullptr;
 
