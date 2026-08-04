@@ -3,10 +3,20 @@ Somatic Camera SF"  — Beta
 **A first-person camera overhaul for Starfield that lets you see your full character body in first-person view.**
 
 
+New Beta 7:
+Added support for Osf UI (by ozooma10)
+You can now change pseudo-camera settings in-game, such as:
+- iToggleKey (currently has an issue with Numpad)
+- fFOV
+- bAutoEquipHideHeadSS
+- bAutoEquipHideHead
+- fSideOffset
+- fForwardOffset
+- fUpOffset
+Fixed various bugs
 
-New Beta 6 V4:
+(Beta 6 V4)
 Updated the code so that setting bAutoEquipHideHeadSS=0 prevents the pseudo-camera from unequipping your currently fitted helmet.
-Fixed an issue where ADS would cause the invisible helmet to unequip.
 Added auto-re-equipping of your previously equipped helmet upon disabling the pseudo-camera.
 When activating the pseudo-camera, an invisible headgear and invisible helmet are now added to your inventory.
 Added settings in the SomaticCameraSF.ini file to auto-equip the invisible head items (enabled by default).
